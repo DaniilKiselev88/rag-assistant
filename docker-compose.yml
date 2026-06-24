@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: rag_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./routers:/app/routers
+      - ./services:/app/services
+      - ./models:/app/models
+      - chroma_data:/app/chroma_db
+    networks:
+      - rag_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: rag_frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit_app.py:/app/streamlit_app.py
+    depends_on:
+      - backend
+    networks:
+      - rag_network
+
+volumes:
+  chroma_data:
+    driver: local
+
+networks:
+  rag_network:
+    driver: bridge
